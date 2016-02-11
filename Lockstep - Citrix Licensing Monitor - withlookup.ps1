@@ -332,11 +332,14 @@ $Services = Get-Service $ServiceNames -ComputerName $ComputerName -ErrorAction S
 ###############################################################################
 # output
 
+# this widens the buffer to prevent "chopping" long lines caused by long product names.
+$Host.UI.RawUI.BufferSize = New-Object Management.Automation.Host.Size (500,25)
+
 $XMLOutput = "<prtg>`n"
 
 foreach ($Service in $Services) {
-	if ($Service.Status -ne "Running") { $State = 1 } else { $State = 0 }
-	$XmlOutput += Set-PrtgResult $("Service: " + $Service.DisplayName) $State state -me 0 -em "Service is not running" -ValueLookup "lockstep.sensor.citrix.licensing"
+	if ($Service.Status -ne "Running") { $State = 2 } else { $State = 1 }
+	$XmlOutput += Set-PrtgResult $("Service: " + $Service.DisplayName) $State state -me 1 -em "Service is not running" -ValueLookup "prtg.standardlookups.yesno.stateyesok"
 }
 
 foreach ($License in $LicensingData) {
